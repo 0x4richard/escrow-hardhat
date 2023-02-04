@@ -80,6 +80,10 @@ function App() {
         <Box p={5} shadow="md" borderWidth="1px">
           <Heading>New Contract</Heading>
           <label>
+            Depositor
+            <Input id="depositor" value={account} disabled/>
+          </label>
+          <label>
             Arbiter Address
             <Input id="arbiter" placeholder="arbiter"/>
           </label>
