@@ -2,6 +2,7 @@ import { ethers } from 'ethers';
 import { useEffect, useState } from 'react';
 import deploy from './deploy';
 import Escrow from './Escrow';
+import { Button, Input, HStack, Box, Heading, TableContainer, Table, Thead, Tr, Th, Tbody } from '@chakra-ui/react'
 
 const provider = new ethers.providers.Web3Provider(window.ethereum);
 
@@ -55,45 +56,50 @@ function App() {
 
   return (
     <>
-      <div className="contract">
-        <h1> New Contract </h1>
-        <label>
-          Arbiter Address
-          <input type="text" id="arbiter" />
-        </label>
+      <HStack spacing={8}>
+        <Box p={5} shadow="md" borderWidth="1px">
+          <Heading>New Contract</Heading>
+          <label>
+            Arbiter Address
+            <Input id="arbiter" placeholder="arbiter"/>
+          </label>
 
-        <label>
-          Beneficiary Address
-          <input type="text" id="beneficiary" />
-        </label>
+          <label>
+            Beneficiary Address
+            <Input id="beneficiary" placeholder="beneficiary"/>
+          </label>
 
-        <label>
-          Deposit Amount (in Wei)
-          <input type="text" id="wei" />
-        </label>
+          <label>
+            Deposit Amount (in Wei)
+            <Input id="wei" placeholder='Deposit Amount (in Wei)'/>
+          </label>
 
-        <div
-          className="button"
-          id="deploy"
-          onClick={(e) => {
+          <Button id="deploy" mt={5} onClick={(e) => {
             e.preventDefault();
-
             newContract();
-          }}
-        >
-          Deploy
-        </div>
-      </div>
-
-      <div className="existing-contracts">
-        <h1> Existing Contracts </h1>
-
-        <div id="container">
-          {escrows.map((escrow) => {
-            return <Escrow key={escrow.address} {...escrow} />;
-          })}
-        </div>
-      </div>
+          } } >Deploy Contract</Button>
+        </Box>
+        <Box p={5} shadow="md" borderWidth="1px">
+          <Heading>Existing Contracts</Heading>
+          <TableContainer>
+            <Table variant="simple">
+              <Thead>
+                <Tr>
+                  <Th>Arbviter</Th>
+                  <Th>Beneficiary</Th>
+                  <Th>Value</Th>
+                  <Th></Th>
+                </Tr>
+              </Thead>
+              <Tbody>
+                {escrows.map((escrow) => {
+                  return <Escrow key={escrow.address} {...escrow} />;
+                })}
+              </Tbody>
+            </Table>
+          </TableContainer>
+        </Box>
+      </HStack>
     </>
   );
 }
