@@ -1,4 +1,4 @@
-import { Button, Td, Tr } from "@chakra-ui/react"
+import { Button, Td, Tr } from "@chakra-ui/react";
 
 export default function Escrow({
   address,
@@ -13,10 +13,15 @@ export default function Escrow({
       <Td>{beneficiary}</Td>
       <Td>{value}</Td>
       <Td>
-        <Button id={address} onClick={(e) => {
+        <Button
+          id={address}
+          onClick={(e) => {
             e.preventDefault();
-            handleApprove()
-          }}>Approve</Button>
+            handleApprove();
+          }}
+        >
+          Approve
+        </Button>
       </Td>
     </Tr>
   );
