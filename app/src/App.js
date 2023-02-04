@@ -33,7 +33,7 @@ function App() {
   async function deployContract() {
     const beneficiary = document.getElementById('beneficiary').value;
     const arbiter = document.getElementById('arbiter').value;
-    const value = ethers.BigNumber.from(document.getElementById('wei').value);
+    const value = ethers.utils.parseEther(document.getElementById('ether').value);
 
     return deploy(signer, arbiter, beneficiary, value);
   }
@@ -94,8 +94,8 @@ function App() {
           </label>
 
           <label>
-            Deposit Amount (in Wei)
-            <Input id="wei" placeholder='Deposit Amount (in Wei)'/>
+            Deposit Amount (in Ether)
+            <Input id="ether" placeholder='Deposit Amount (in ether)'/>
           </label>
 
           <Button id="deploy" mt={5} disabled={isDeploying} onClick={(e) => {
