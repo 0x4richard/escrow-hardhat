@@ -1,6 +1,8 @@
 import { Button, Td, Tr } from "@chakra-ui/react";
+import useContract from "./useContract";
 
 export default function Escrow({
+  address,
   account,
   depositor,
   arbiter,
@@ -8,7 +10,19 @@ export default function Escrow({
   isApproved,
   value,
 }) {
-  const isAllowedToApprove = depositor === account;
+  const isAllowedToApprove =
+    arbiter.toString().toLowerCase() ===
+    account.account.toString().toLowerCase();
+  const { getContractByAddress, provider } = useContract();
+
+  const approveEscrow = async () => {
+    if (!isAllowedToApprove) return;
+
+    const escrowContract = getContractByAddress(address);
+    const signer = provider.getSigner();
+    const approveTxn = await escrowContract.connect(signer).approve();
+    await approveTxn.wait();
+  };
 
   return (
     <Tr>
@@ -19,8 +33,10 @@ export default function Escrow({
       <Td>
         {isApproved ? (
           "Approved"
+        ) : isAllowedToApprove ? (
+          <Button onClick={() => approveEscrow()}>Approve</Button>
         ) : (
-          <Button disabled={!isAllowedToApprove}>Approve</Button>
+          "Pending Approval"
         )}
       </Td>
     </Tr>

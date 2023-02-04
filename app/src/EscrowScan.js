@@ -14,30 +14,14 @@ import {
   Tr,
 } from "@chakra-ui/react";
 import { ethers } from "ethers";
-import EscrowContract from "./artifacts/contracts/Escrow.sol/Escrow";
 import Escrow from "./Escrow";
+import useContract from "./useContract";
 
 function EscrowScan(account) {
-  const provider = new ethers.providers.Web3Provider(window.ethereum);
-  // const escrow = {
-  //   address: escrowContract.address,
-  //   arbiter: "1",
-  //   beneficiary: "1",
-  //   value: "1.11",
-  //   handleApprove: async () => {
-  //     escrowContract.on('Approved', () => {
-  //       document.getElementById(escrowContract.address).className =
-  //         'complete';
-  //       document.getElementById(escrowContract.address).innerText =
-  //         "✓ It's been approved!";
-  //     });
-
-  //     await approve(escrowContract, signer);
-  //   },
-  // };
   const [contractAddress, setContractAddress] = useState();
   const [escrow, setEscrow] = useState();
   const toast = useToast();
+  const { provider, getContractByAddress } = useContract();
 
   const loadContract = async () => {
     if (!contractAddress) {
@@ -49,19 +33,33 @@ function EscrowScan(account) {
       return;
     }
 
-    const contract = new ethers.Contract(
-      contractAddress,
-      EscrowContract.abi,
-      provider
-    );
+    const contract = getContractByAddress(contractAddress);
 
-    const arbiter = await contract.arbiter();
-    const beneficiary = await contract.beneficiary();
-    const depositor = await contract.depositor();
-    const isApproved = await contract.isApproved();
-    const balance = await provider.getBalance(contract.address);
+    const arbiterPromise = contract.arbiter();
+    const beneficiaryPromise = contract.beneficiary();
+    const depositorPromise = contract.depositor();
+    const isApprovedPromise = contract.isApproved();
+    const balancePromise = provider.getBalance(contract.address);
+    const [arbiter, beneficiary, depositor, isApproved, balance] =
+      await Promise.all([
+        arbiterPromise,
+        beneficiaryPromise,
+        depositorPromise,
+        isApprovedPromise,
+        balancePromise,
+      ]);
+
     const value = ethers.utils.formatEther(balance);
-    setEscrow({ account, arbiter, beneficiary, depositor, value, isApproved });
+
+    setEscrow({
+      address: contractAddress,
+      account: account,
+      arbiter,
+      beneficiary,
+      depositor,
+      value,
+      isApproved,
+    });
   };
 
   return (

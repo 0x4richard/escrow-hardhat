@@ -3,17 +3,11 @@ import { useEffect, useState } from "react";
 import deploy from "./deploy";
 import { Button, Input, Stack, Box, Heading, useToast } from "@chakra-ui/react";
 import EscrowScan from "./EscrowScan";
-
-const provider = new ethers.providers.Web3Provider(window.ethereum);
-
-export async function approve(escrowContract, signer) {
-  const approveTxn = await escrowContract.connect(signer).approve();
-  await approveTxn.wait();
-}
+import useContract from "./useContract";
 
 function App() {
+  const { getAccount, provider } = useContract();
   const toast = useToast();
-  // const [escrows, setEscrows] = useState([]);
   const [account, setAccount] = useState();
   const [signer, setSigner] = useState();
   const [buttonText, setButtonText] = useState("Deploy Contract");
@@ -21,9 +15,7 @@ function App() {
 
   useEffect(() => {
     async function getAccounts() {
-      const accounts = await provider.send("eth_requestAccounts", []);
-
-      setAccount(accounts[0]);
+      setAccount(await getAccount());
       setSigner(provider.getSigner());
     }
 
@@ -58,8 +50,6 @@ function App() {
       setIsDeploying(false);
       setButtonText("Deploy Contract");
     }
-
-    // setEscrows([...escrows, escrow]);
   }
 
   return (
