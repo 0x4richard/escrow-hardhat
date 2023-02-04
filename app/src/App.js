@@ -1,8 +1,8 @@
 import { ethers } from 'ethers';
 import { useEffect, useState } from 'react';
 import deploy from './deploy';
-import Escrow from './Escrow';
-import { Button, Input, HStack, Box, Heading, TableContainer, Table, Thead, Tr, Th, Tbody } from '@chakra-ui/react'
+// import Escrow from './Escrow';
+import { Button, Input, HStack, Box, Heading, useToast } from '@chakra-ui/react'
 
 const provider = new ethers.providers.Web3Provider(window.ethereum);
 
@@ -12,9 +12,12 @@ export async function approve(escrowContract, signer) {
 }
 
 function App() {
-  const [escrows, setEscrows] = useState([]);
+  const toast = useToast();
+  // const [escrows, setEscrows] = useState([]);
   const [account, setAccount] = useState();
   const [signer, setSigner] = useState();
+  const [buttonText, setButtonText] = useState("Deploy Contract");
+  const [isDeploying, setIsDeploying] = useState(false)
 
   useEffect(() => {
     async function getAccounts() {
@@ -27,31 +30,48 @@ function App() {
     getAccounts();
   }, [account]);
 
-  async function newContract() {
+  async function deployContract() {
     const beneficiary = document.getElementById('beneficiary').value;
     const arbiter = document.getElementById('arbiter').value;
     const value = ethers.BigNumber.from(document.getElementById('wei').value);
-    const escrowContract = await deploy(signer, arbiter, beneficiary, value);
+
+    return deploy(signer, arbiter, beneficiary, value);
+  }
+
+  async function newContract() {
+    setIsDeploying(true);
+    setButtonText("Deploying...");
+
+    // let escrowContract;
+    try {
+      await deployContract();
+    } catch(ex) {
+      console.log(ex);
+      toast({title: "Failed to deploy the contract.", status: "error", isClosable: true});
+    } finally {
+      setIsDeploying(false);
+      setButtonText("Deploy Contract")
+    }
 
 
-    const escrow = {
-      address: escrowContract.address,
-      arbiter,
-      beneficiary,
-      value: value.toString(),
-      handleApprove: async () => {
-        escrowContract.on('Approved', () => {
-          document.getElementById(escrowContract.address).className =
-            'complete';
-          document.getElementById(escrowContract.address).innerText =
-            "✓ It's been approved!";
-        });
+    // const escrow = {
+    //   address: escrowContract.address,
+    //   arbiter: "1",
+    //   beneficiary: "1",
+    //   value: "1.11",
+    //   handleApprove: async () => {
+    //     escrowContract.on('Approved', () => {
+    //       document.getElementById(escrowContract.address).className =
+    //         'complete';
+    //       document.getElementById(escrowContract.address).innerText =
+    //         "✓ It's been approved!";
+    //     });
 
-        await approve(escrowContract, signer);
-      },
-    };
+    //     await approve(escrowContract, signer);
+    //   },
+    // };
 
-    setEscrows([...escrows, escrow]);
+    // setEscrows([...escrows, escrow]);
   }
 
   return (
@@ -74,12 +94,12 @@ function App() {
             <Input id="wei" placeholder='Deposit Amount (in Wei)'/>
           </label>
 
-          <Button id="deploy" mt={5} onClick={(e) => {
+          <Button id="deploy" mt={5} disabled={isDeploying} onClick={(e) => {
             e.preventDefault();
             newContract();
-          } } >Deploy Contract</Button>
+          } }>{buttonText}</Button>
         </Box>
-        <Box p={5} shadow="md" borderWidth="1px">
+        {/* <Box p={5} shadow="md" borderWidth="1px">
           <Heading>Existing Contracts</Heading>
           <TableContainer>
             <Table variant="simple">
@@ -98,7 +118,7 @@ function App() {
               </Tbody>
             </Table>
           </TableContainer>
-        </Box>
+        </Box> */}
       </HStack>
     </>
   );
