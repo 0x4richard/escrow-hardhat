@@ -1,14 +1,8 @@
 import { ethers } from "ethers";
 import { useEffect, useState } from "react";
 import deploy from "./deploy";
-import {
-  Button,
-  Input,
-  HStack,
-  Box,
-  Heading,
-  useToast,
-} from "@chakra-ui/react";
+import { Button, Input, Stack, Box, Heading, useToast } from "@chakra-ui/react";
+import EscrowScan from "./EscrowScan";
 
 const provider = new ethers.providers.Web3Provider(window.ethereum);
 
@@ -70,7 +64,7 @@ function App() {
 
   return (
     <>
-      <HStack spacing={8}>
+      <Stack spacing={8}>
         <Box p={5} shadow="md" borderWidth="1px">
           <Heading>New Contract</Heading>
           <label>
@@ -104,7 +98,8 @@ function App() {
             {buttonText}
           </Button>
         </Box>
-      </HStack>
+        <EscrowScan key={account} account={account} />
+      </Stack>
     </>
   );
 }

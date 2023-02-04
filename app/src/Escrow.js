@@ -1,27 +1,27 @@
 import { Button, Td, Tr } from "@chakra-ui/react";
 
 export default function Escrow({
-  address,
+  account,
+  depositor,
   arbiter,
   beneficiary,
+  isApproved,
   value,
-  handleApprove,
 }) {
+  const isAllowedToApprove = depositor === account;
+
   return (
     <Tr>
+      <Td>{depositor}</Td>
       <Td>{arbiter}</Td>
       <Td>{beneficiary}</Td>
-      <Td>{value}</Td>
+      <Td>{value} ETH</Td>
       <Td>
-        <Button
-          id={address}
-          onClick={(e) => {
-            e.preventDefault();
-            handleApprove();
-          }}
-        >
-          Approve
-        </Button>
+        {isApproved ? (
+          "Approved"
+        ) : (
+          <Button disabled={!isAllowedToApprove}>Approve</Button>
+        )}
       </Td>
     </Tr>
   );
