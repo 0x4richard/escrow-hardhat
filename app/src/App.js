@@ -1,9 +1,18 @@
 import { ethers } from "ethers";
 import { useEffect, useState } from "react";
 import deploy from "./deploy";
-import { Button, Input, Stack, Box, Heading, useToast } from "@chakra-ui/react";
+import {
+  Button,
+  Input,
+  Stack,
+  Box,
+  Heading,
+  useToast,
+  useDisclosure,
+} from "@chakra-ui/react";
 import EscrowScan from "./EscrowScan";
 import useContract from "./useContract";
+import TxnModal from "./TxnModal";
 
 function App() {
   const { getAccount, provider } = useContract();
@@ -12,6 +21,8 @@ function App() {
   const [signer, setSigner] = useState();
   const [buttonText, setButtonText] = useState("Deploy Contract");
   const [isDeploying, setIsDeploying] = useState(false);
+  const [txnText, setTxnText] = useState("");
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   useEffect(() => {
     async function getAccounts() {
@@ -36,9 +47,9 @@ function App() {
     setIsDeploying(true);
     setButtonText("Deploying...");
 
-    // let escrowContract;
+    let escrowContract;
     try {
-      await deployContract();
+      escrowContract = await deployContract();
     } catch (ex) {
       console.log(ex);
       toast({
@@ -49,11 +60,19 @@ function App() {
     } finally {
       setIsDeploying(false);
       setButtonText("Deploy Contract");
+      setTxnText(`Contract address: ${escrowContract.address}`);
+      onOpen();
     }
   }
 
   return (
     <>
+      <TxnModal
+        isOpen={isOpen}
+        onClose={onClose}
+        title="Deploy contract successfully"
+        text={txnText}
+      />
       <Stack spacing={8}>
         <Box p={5} shadow="md" borderWidth="1px">
           <Heading>New Contract</Heading>
